@@ -1,5 +1,7 @@
 package me.deanx.manhunt;
 
+import org.bukkit.Difficulty;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
@@ -36,6 +38,62 @@ public class Configs {
         ConfigurationSection config = plugin.getConfig().getConfigurationSection("config.hunter");
         assert config != null;
         return new PlayerInventory(config);
+    }
+
+    public int getStartWaitingTime() {
+        return plugin.getConfig().getInt("config.hunter.waiting_time");
+    }
+
+    public GameMode getGameMode() {
+        String gameModeName = plugin.getConfig().getString("config.game.gamemode");
+        if (gameModeName == null) {
+            return GameMode.SURVIVAL;
+        }
+        switch (gameModeName.toUpperCase()) {
+            case "CREATIVE":
+                return GameMode.CREATIVE;
+            case "ADVENTURE":
+                return GameMode.ADVENTURE;
+            case "SPECTATOR":
+                return GameMode.SPECTATOR;
+            case "SURVIVAL":
+            default:
+                return GameMode.SURVIVAL;
+        }
+    }
+
+    public Difficulty getDifficulty() {
+        String difficultyName = plugin.getConfig().getString("config.environment.difficulty");
+        if (difficultyName == null) {
+            return Difficulty.HARD;
+        }
+        switch (difficultyName.toUpperCase()) {
+            case "PEACEFUL":
+                return Difficulty.PEACEFUL;
+            case "EASY":
+                return Difficulty.EASY;
+            case "NORMAL":
+                return Difficulty.NORMAL;
+            case "HARD":
+            default:
+                return Difficulty.HARD;
+        }
+    }
+
+    public long getWorldTime() {
+        return plugin.getConfig().getLong("config.environment.time");
+    }
+
+    public int getMaxHealth() {
+        return plugin.getConfig().getInt("config.game.max_health");
+    }
+
+    public boolean isCompassEnabled() {
+        return plugin.getConfig().getBoolean("config.game.enable_compass");
+    }
+
+    public boolean isClearAdvancements() {
+        return plugin.getConfig().getBoolean("config.game.clear_advancements");
     }
 
     public static class PlayerInventory {

@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: [ master ]
 
+permissions:
+  contents: write
+
 jobs:
   build:
 
@@ -22,13 +25,12 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: gradle
-    - name: Set up Gradle
+    - name: Build with Gradle
       uses: gradle/actions/setup-gradle@v3
       with:
+        arguments: jar
         dependency-graph: generate-and-submit
         artifact-retention-days: 7
-    - name: Build with Gradle
-      run: ./gradlew jar
     - name: Push release
       run: |
         cd build/libs || exit 1

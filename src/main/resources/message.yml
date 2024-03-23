@@ -1,0 +1,17 @@
+message_file_updates: The message file has been updated. Users with translated versions, please ensure your translations are updated.
+runner_start_msg: You are Runner. RUN!
+runner_hunting_start_msg: Hunters start hunting now.
+hunter_start_msg: You are hunter, please wait for $sec$s.
+set_runner: $p$ is set to be Runner.
+cannot_find_player: Cannot find player $p$.
+win: You Win
+lose: You Lose
+runner_dead: Runner is killed
+runner_enter_nether: Runner Entered Nether
+compass_swap: Swap compass to the last item on the hotbar
+err:
+  change_runner_in_game: Cannot change runner during game.
+  runner_empty: Please set the runner first.
+  game_running: Hunting Game is already running.
+  compass_add: Cannot get the compass. Inventory is full.
+  not_enough_player: Not enough player for the game.

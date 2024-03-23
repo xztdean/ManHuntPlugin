@@ -3,6 +3,7 @@ package me.deanx.manhunt;
 import me.deanx.manhunt.command.ManHuntCommand;
 import me.deanx.manhunt.command.ManHuntTabCompleter;
 import me.deanx.manhunt.config.Configs;
+import me.deanx.manhunt.config.Messages;
 import me.deanx.manhunt.listener.DropItem;
 import me.deanx.manhunt.listener.Respawn;
 import me.deanx.manhunt.listener.Result;
@@ -25,6 +26,7 @@ public class ManHuntPlugin extends JavaPlugin {
     public void onEnable() {
         getLogger().info("ManHunt plugin start");
         Configs.initialize(this);
+        Messages.initialize(this);
         new ManHuntCommand(this);
         new ManHuntTabCompleter(this);
     }

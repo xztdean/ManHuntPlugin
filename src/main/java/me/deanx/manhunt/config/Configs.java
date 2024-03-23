@@ -1,5 +1,6 @@
-package me.deanx.manhunt;
+package me.deanx.manhunt.config;
 
+import me.deanx.manhunt.ManHuntPlugin;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -12,9 +13,16 @@ import java.util.List;
 public class Configs {
     private static Configs instance = null;
 
-    public static Configs getInstance(ManHuntPlugin plugin) {
+    public static void initialize(ManHuntPlugin plugin) {
+        if (instance != null) {
+            throw new IllegalStateException("Configs has already been initialized");
+        }
+        instance = new Configs(plugin);
+    }
+
+    public static Configs getInstance() {
         if (instance == null) {
-            instance = new Configs(plugin);
+            throw new IllegalStateException("Configs has not been initialized");
         }
         return instance;
     }

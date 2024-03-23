@@ -24,10 +24,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-public class ManHunt implements CommandExecutor {
+public class ManHuntCommand implements CommandExecutor {
     private final ManHuntPlugin plugin;
 
-    public ManHunt(ManHuntPlugin plugin) {
+    public ManHuntCommand(ManHuntPlugin plugin) {
         this.plugin = plugin;
         plugin.getCommand("ManHunt").setExecutor(this);
     }

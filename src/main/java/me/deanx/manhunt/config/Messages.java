@@ -69,8 +69,83 @@ public class Messages {
         }
 
         if (updated) {
-            plugin.getLogger().log(Level.INFO, config.getString("message_file_updates"));
+            plugin.getLogger().log(Level.INFO, get("message_file_updates"));
             save();
         }
+    }
+
+    private String get(String key) {
+        String message = config.getString(key);
+        if (message == null) {
+            plugin.getLogger().log(Level.SEVERE, "Message key not found: " + key);
+            throw new IllegalArgumentException("Message key not found: " + key);
+        }
+        return message;
+    }
+
+    public String getRunnerStartMsg() {
+        return get("runner_start");
+    }
+
+    public String getHunterStartMsg() {
+        return get("hunter_start");
+    }
+
+    public String getHuntingStartMsgForRunner() {
+        return get("runner_hunting_start");
+    }
+
+    public String getSetRunnerMsg(String playerName) {
+        if (playerName == null) {
+            throw new IllegalArgumentException("Player name cannot be null");
+        }
+        return get("string.set_runner").replace("$p$", playerName);
+    }
+
+    public String getPlayerNotFoundMsg(String playerName) {
+        if (playerName == null) {
+            throw new IllegalArgumentException("Player name cannot be null");
+        }
+        return get("string.player_not_found").replace("$p$", playerName);
+    }
+
+    public String getWinMsg() {
+        return get("win");
+    }
+
+    public String getLoseMsg() {
+        return get("lose");
+    }
+
+    public String getRunnerDeathMsg() {
+        return get("runner_dead");
+    }
+
+    public String getRunnerEnterNetherMsg() {
+        return get("runner_enter_nether");
+    }
+
+    public String getCompassSwapMsg() {
+        return get("compass_swap");
+    }
+
+    public String getChangeRunnerInGameErrorMsg() {
+        return get("err.change_runner_in_game");
+    }
+
+    public String getRunnerNotSetErrorMsg() {
+        return get("err.runner_not_set");
+    }
+
+    public String getGameInProgressErrorMsg() {
+        return get("err.game_in_progress");
+    }
+
+    public String getAddCompassErrorMsg() {
+        return get("err.compass_add");
+    }
+
+    public String getNotEnoughPlayerErrorMsg() {
+        return get("err.not_enough_player");
     }
 }

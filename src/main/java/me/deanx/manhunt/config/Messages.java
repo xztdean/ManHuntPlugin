@@ -87,8 +87,8 @@ public class Messages {
         return get("runner_start");
     }
 
-    public String getHunterStartMsg() {
-        return get("hunter_start");
+    public String getHunterStartMsg(int time) {
+        return get("hunter_start").replace("$sec$", String.valueOf(time));
     }
 
     public String getHuntingStartMsgForRunner() {

@@ -12,8 +12,12 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -47,6 +51,7 @@ public class ManhuntGame {
 
         prepareWorld();
         prepareRunner();
+        prepareHunters();
     }
 
     private void prepareWorld() {
@@ -63,13 +68,33 @@ public class ManhuntGame {
         Configs configs = Configs.getInstance();
         setPlayerInventory(runner, configs.getRunnerInventory());
         setInitialState(runner);
-        runner.setRespawnLocation(null);
         runner.sendMessage(Messages.getInstance().getRunnerStartMsg());
 
         double tickRate = runner.getServer().getServerTickManager().getTickRate();
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             runner.sendMessage(Messages.getInstance().getHuntingStartMsgForRunner());
         }, (long) (configs.getStartWaitingTime() * tickRate));
+    }
+
+    private void prepareHunters() {
+        Configs configs = Configs.getInstance();
+        double tickRate = runner.getServer().getServerTickManager().getTickRate();
+        int startWaitingTime = configs.getStartWaitingTime();
+        int waitingTicks = (int) (startWaitingTime * tickRate);
+        List<PotionEffect> effects = Arrays.asList(
+            new PotionEffect(PotionEffectType.BLINDNESS, waitingTicks, 0),
+            new PotionEffect(PotionEffectType.SLOW_DIGGING, waitingTicks, 128),
+            new PotionEffect(PotionEffectType.HEAL, waitingTicks, 128)
+        );
+
+        for (Player hunter : hunters) {
+            setPlayerInventory(hunter, configs.getHunterInventory());
+            setInitialState(hunter);
+            hunter.addPotionEffects(effects);
+            hunter.sendMessage(Messages.getInstance().getHunterStartMsg(startWaitingTime));
+        }
+
+        hunterWaitingCountdown();
     }
 
     private void setPlayerInventory(Player player, Configs.PlayerInventory inventory) {
@@ -116,6 +141,7 @@ public class ManhuntGame {
         player.setSaturation(5); // Game default value
 
         player.setGameMode(configs.getGameMode());
+        player.setRespawnLocation(null);
 
         // Clear all advancement
         if (configs.isClearAdvancements()) {
@@ -152,5 +178,31 @@ public class ManhuntGame {
                 player.setCompassTarget(runner.getLocation());
             }
         }
+    }
+
+    private void hunterWaitingCountdown() {
+        Configs configs = Configs.getInstance();
+        double tickRate = runner.getServer().getServerTickManager().getTickRate();
+        int startWaitingTime = configs.getStartWaitingTime();
+
+        int fadeInOutTick = (int) (tickRate * 0.1);
+        int stayTick = (int) (tickRate - fadeInOutTick * 2);
+        long totalTick = fadeInOutTick * 2L + stayTick;
+
+        BukkitScheduler scheduler = Bukkit.getScheduler();
+
+        for (int i = 0; i < startWaitingTime; ++i) {
+            String timeRemaining = String.valueOf(startWaitingTime - i);
+            scheduler.runTaskLater(plugin, () -> {
+                for (Player hunter : hunters) {
+                    hunter.sendTitle(timeRemaining, null, fadeInOutTick, stayTick, fadeInOutTick);
+                }
+            }, i * totalTick);
+        }
+        scheduler.runTaskLater(plugin, () -> {
+            for (Player hunter : hunters) {
+                hunter.sendTitle("Go!", null, fadeInOutTick, stayTick, fadeInOutTick);
+            }
+        }, startWaitingTime * totalTick);
     }
 }

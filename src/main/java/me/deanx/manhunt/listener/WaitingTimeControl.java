@@ -10,6 +10,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 public class WaitingTimeControl implements Listener {
@@ -58,6 +59,13 @@ public class WaitingTimeControl implements Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         if (plugin.isHunter(event.getPlayer())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerKick(PlayerKickEvent event) {
+        if (plugin.isHunter(event.getPlayer()) && event.getReason().contains("Flying is not enabled")) {
             event.setCancelled(true);
         }
     }

@@ -6,7 +6,7 @@ import me.deanx.manhunt.config.Configs;
 import me.deanx.manhunt.config.Messages;
 import me.deanx.manhunt.listener.DropItem;
 import me.deanx.manhunt.listener.Respawn;
-import me.deanx.manhunt.listener.Result;
+import me.deanx.manhunt.listener.ResultChecker;
 import me.deanx.manhunt.listener.RunnerLocation;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -59,7 +59,7 @@ public class ManHuntPlugin extends JavaPlugin {
 
     public void registerListener() {
         new Respawn(this);
-        new Result(this);
+        new ResultChecker(this);
         if (getConfig().getBoolean("config.game.enable_compass")) {
             new RunnerLocation(this);
             new DropItem(this);

@@ -2,6 +2,7 @@ package me.deanx.manhunt;
 
 import me.deanx.manhunt.config.Configs;
 import me.deanx.manhunt.config.Messages;
+import me.deanx.manhunt.listener.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -10,6 +11,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
@@ -24,9 +26,16 @@ import java.util.List;
 public class ManhuntGame {
     private static ManhuntGame instance = null;
 
-    public static ManhuntGame getInstance(ManHuntPlugin plugin) {
+    public static void initialize(ManHuntPlugin plugin) {
+        if (instance != null) {
+            throw new IllegalStateException("ManhuntGame has already been initialized");
+        }
+        instance = new ManhuntGame(plugin);
+    }
+
+    public static ManhuntGame getInstance() {
         if (instance == null) {
-            instance = new ManhuntGame(plugin);
+            throw new IllegalStateException("ManhuntGame has not been initialized");
         }
         return instance;
     }
@@ -52,6 +61,18 @@ public class ManhuntGame {
         prepareWorld();
         prepareRunner();
         prepareHunters();
+
+        registerListener();
+        isRunning = true;
+    }
+
+    public void stopGame() {
+        Bukkit.getScheduler().cancelTasks(plugin);
+        HandlerList.unregisterAll(plugin);
+        isRunning = false;
+
+        instance = null;
+        initialize(plugin);
     }
 
     private void prepareWorld() {
@@ -95,6 +116,7 @@ public class ManhuntGame {
         }
 
         hunterWaitingCountdown();
+        new WaitingTimeControl(plugin, waitingTicks);
     }
 
     private void setPlayerInventory(Player player, Configs.PlayerInventory inventory) {
@@ -204,5 +226,14 @@ public class ManhuntGame {
                 hunter.sendTitle("Go!", null, fadeInOutTick, stayTick, fadeInOutTick);
             }
         }, startWaitingTime * totalTick);
+    }
+
+    private void registerListener() {
+        new Respawn(plugin);
+        new ResultChecker(plugin);
+        if (Configs.getInstance().isCompassEnabled()) {
+            new RunnerLocation(plugin);
+            new DropItem(plugin);
+        }
     }
 }

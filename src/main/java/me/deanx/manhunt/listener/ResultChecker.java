@@ -7,11 +7,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.world.PortalCreateEvent;
 
-public class Result implements Listener {
+public class ResultChecker implements Listener {
     private final ManHuntPlugin plugin;
 
-    public Result(ManHuntPlugin plugin) {
+    public ResultChecker(ManHuntPlugin plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }

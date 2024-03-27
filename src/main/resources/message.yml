@@ -9,6 +9,7 @@ lose: You Lose
 runner_dead: Runner is killed
 runner_enter_nether: Runner Entered Nether
 compass_swap: Swap compass to the last item on the hotbar
+portal_created: Portal created at $x$ $y$ $z$
 err:
   change_runner_in_game: Cannot change runner during game.
   runner_not_set: Please set the runner first.

@@ -8,8 +8,6 @@ import me.deanx.manhunt.listener.DropItem;
 import me.deanx.manhunt.listener.Respawn;
 import me.deanx.manhunt.listener.ResultChecker;
 import me.deanx.manhunt.listener.RunnerLocation;
-import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -76,34 +74,5 @@ public class ManHuntPlugin extends JavaPlugin {
 
     public boolean isStart() {
         return status;
-    }
-
-    public void runnerLose() {
-        runner.playSound(runner.getLocation(), Sound.ENTITY_IRON_GOLEM_DEATH, 1, 1);
-        runner.sendTitle(getConfig().getString("string.lose"), null, 20, 40, 20);
-        for (Player hunter : hunters) {
-            hunter.playSound(hunter.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
-            hunter.sendTitle(getConfig().getString("string.win"),
-                    getConfig().getString("string.runner_dead"), 20, 40, 20);
-        }
-        endGame();
-    }
-
-    public void runnerWin() {
-        runner.playSound(runner.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
-        runner.sendTitle(getConfig().getString("string.win"), null, 20, 40, 20);
-        for (Player hunter : hunters) {
-            hunter.playSound(hunter.getLocation(), Sound.ENTITY_IRON_GOLEM_DEATH, 1, 1);
-            hunter.sendTitle(getConfig().getString("string.lose"),
-                    getConfig().getString("string.runner_enter_nether"), 20, 40, 20);
-        }
-        endGame();
-    }
-
-    public void updateCompass() {
-        Location location = runner.getLocation();
-        for (Player hunter : hunters) {
-            hunter.setCompassTarget(location);
-        }
     }
 }

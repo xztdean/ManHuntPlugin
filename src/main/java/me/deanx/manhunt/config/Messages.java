@@ -129,6 +129,13 @@ public class Messages {
         return get("compass_swap");
     }
 
+    public String getPortalCreatedMsg(int x, int y, int z) {
+        return get("portal_created")
+                .replace("$x$", String.valueOf(x))
+                .replace("$y$", String.valueOf(y))
+                .replace("$z$", String.valueOf(z));
+    }
+
     public String getChangeRunnerInGameErrorMsg() {
         return get("err.change_runner_in_game");
     }

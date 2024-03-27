@@ -4,7 +4,9 @@ import me.deanx.manhunt.config.Configs;
 import me.deanx.manhunt.config.Messages;
 import me.deanx.manhunt.listener.*;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.attribute.Attribute;
@@ -58,6 +60,8 @@ public class ManhuntGame {
             throw new IllegalStateException(Messages.getInstance().getNotEnoughPlayerErrorMsg());
         }
 
+        generateHunterList();
+
         prepareWorld();
         prepareRunner();
         prepareHunters();
@@ -73,6 +77,34 @@ public class ManhuntGame {
 
         instance = null;
         initialize(plugin);
+    }
+
+    public void setRunner(Player runner) {
+        if (isRunning) {
+            throw new IllegalStateException(Messages.getInstance().getChangeRunnerInGameErrorMsg());
+        }
+        this.runner = runner;
+        Bukkit.getServer().broadcastMessage(Messages.getInstance().getSetRunnerMsg(runner.getDisplayName()));
+    }
+
+    public boolean isRunner(Player player) {
+        return runner == player;
+    }
+
+    public boolean isHunter(Player player) {
+        return hunters.contains(player);
+    }
+
+    public void notifyHunterPortalCreate(Location portalLocation) {
+        for (Player hunter : hunters) {
+            hunter.sendMessage(Messages.getInstance().getPortalCreatedMsg(portalLocation.getBlockX(), portalLocation.getBlockY(), portalLocation.getBlockZ()));
+        }
+        runner.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 0));
+    }
+
+    private void generateHunterList() {
+        hunters.addAll(Bukkit.getOnlinePlayers());
+        hunters.remove(runner);
     }
 
     private void prepareWorld() {
@@ -235,5 +267,34 @@ public class ManhuntGame {
             new RunnerLocation(plugin);
             new DropItem(plugin);
         }
+    }
+
+    public void updateCompass() {
+        Location location = runner.getLocation();
+        for (Player hunter : hunters) {
+            hunter.setCompassTarget(location);
+        }
+    }
+
+    public void runnerWin() {
+        Messages messages = Messages.getInstance();
+        runner.playSound(runner.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
+        runner.sendTitle(messages.getWinMsg(), null, 20, 40, 20);
+        for (Player hunter : hunters) {
+            hunter.playSound(hunter.getLocation(), Sound.ENTITY_IRON_GOLEM_DEATH, 1, 1);
+            hunter.sendTitle(messages.getLoseMsg(), messages.getRunnerEnterNetherMsg(), 20, 40, 20);
+        }
+        stopGame();
+    }
+
+    public void runnerLose() {
+        Messages messages = Messages.getInstance();
+        runner.playSound(runner.getLocation(), Sound.ENTITY_IRON_GOLEM_DEATH, 1, 1);
+        runner.sendTitle(messages.getLoseMsg(), null, 20, 40, 20);
+        for (Player hunter : hunters) {
+            hunter.playSound(hunter.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
+            hunter.sendTitle(messages.getWinMsg(), messages.getRunnerDeathMsg(), 20, 40, 20);
+        }
+        stopGame();
     }
 }

@@ -1,6 +1,7 @@
 package me.deanx.manhunt.listener;
 
 import me.deanx.manhunt.ManHuntPlugin;
+import me.deanx.manhunt.ManhuntGame;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -14,16 +15,15 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 public class WaitingTimeControl implements Listener {
-    private final ManHuntPlugin plugin;
+    private final ManhuntGame game;
 
     public WaitingTimeControl(ManHuntPlugin plugin) {
-        this.plugin = plugin;
+        this.game = ManhuntGame.getInstance();
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     public WaitingTimeControl(ManHuntPlugin plugin, long ticks) {
-        this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        this(plugin);
         Bukkit.getScheduler().runTaskLater(plugin, this::unregister, ticks);
     }
 
@@ -32,7 +32,7 @@ public class WaitingTimeControl implements Listener {
         Entity entity = event.getEntity();
         if (entity instanceof Player) {
             Player player = (Player) entity;
-            if (plugin.isHunter(player)) {
+            if (game.isHunter(player)) {
                 event.setCancelled(true);
             } else {
                 // Only damage from player to runner will be cancelled.
@@ -46,7 +46,7 @@ public class WaitingTimeControl implements Listener {
 
     @EventHandler
     public void onMoving(PlayerMoveEvent event) {
-        if (plugin.isHunter(event.getPlayer())) {
+        if (game.isHunter(event.getPlayer())) {
             Location from = event.getFrom();
             Location to = event.getTo();
             assert to != null;
@@ -58,14 +58,14 @@ public class WaitingTimeControl implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        if (plugin.isHunter(event.getPlayer())) {
+        if (game.isHunter(event.getPlayer())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onPlayerKick(PlayerKickEvent event) {
-        if (plugin.isHunter(event.getPlayer()) && event.getReason().contains("Flying is not enabled")) {
+        if (game.isHunter(event.getPlayer()) && event.getReason().contains("Flying is not enabled")) {
             event.setCancelled(true);
         }
     }

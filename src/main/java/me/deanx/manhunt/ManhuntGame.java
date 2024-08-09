@@ -18,12 +18,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 public class ManhuntGame {
     private static ManhuntGame instance = null;
@@ -87,6 +87,17 @@ public class ManhuntGame {
         Bukkit.getServer().broadcastMessage(Messages.getInstance().getSetRunnerMsg(runner.getDisplayName()));
     }
 
+    public void randomSelectRunner() {
+        if (isRunning) {
+            throw new IllegalStateException(Messages.getInstance().getChangeRunnerInGameErrorMsg());
+        }
+        Player[] playerList = Bukkit.getOnlinePlayers().toArray(new Player[0]);
+        int random = new Random().nextInt(playerList.length);
+        Player selectedPlayer = playerList[random];
+        TitleDisplay.getInstance().displayRandomPlayerSelect(selectedPlayer);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> setRunner(selectedPlayer), 60); // Display animation for 60 ticks
+    }
+
     public boolean isRunner(Player player) {
         return runner == player;
     }
@@ -147,7 +158,7 @@ public class ManhuntGame {
             hunter.sendMessage(Messages.getInstance().getHunterStartMsg(startWaitingTime));
         }
 
-        hunterWaitingCountdown();
+        TitleDisplay.getInstance().countdown(startWaitingTime, hunters, "Go!");
         new WaitingTimeControl(plugin, waitingTicks);
     }
 
@@ -232,32 +243,6 @@ public class ManhuntGame {
                 player.setCompassTarget(runner.getLocation());
             }
         }
-    }
-
-    private void hunterWaitingCountdown() {
-        Configs configs = Configs.getInstance();
-        double tickRate = runner.getServer().getServerTickManager().getTickRate();
-        int startWaitingTime = configs.getStartWaitingTime();
-
-        int fadeInOutTick = (int) (tickRate * 0.1);
-        int stayTick = (int) (tickRate - fadeInOutTick * 2);
-        long totalTick = fadeInOutTick * 2L + stayTick;
-
-        BukkitScheduler scheduler = Bukkit.getScheduler();
-
-        for (int i = 0; i < startWaitingTime; ++i) {
-            String timeRemaining = String.valueOf(startWaitingTime - i);
-            scheduler.runTaskLater(plugin, () -> {
-                for (Player hunter : hunters) {
-                    hunter.sendTitle(timeRemaining, null, fadeInOutTick, stayTick, fadeInOutTick);
-                }
-            }, i * totalTick);
-        }
-        scheduler.runTaskLater(plugin, () -> {
-            for (Player hunter : hunters) {
-                hunter.sendTitle("Go!", null, fadeInOutTick, stayTick, fadeInOutTick);
-            }
-        }, startWaitingTime * totalTick);
     }
 
     private void registerListener() {
